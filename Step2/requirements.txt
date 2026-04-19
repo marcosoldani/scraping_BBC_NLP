@@ -1,0 +1,21 @@
+# Core
+numpy>=2.0
+pandas>=2.0
+
+# Web scraping
+requests>=2.30
+beautifulsoup4>=4.12
+
+# NLP / ML
+nltk>=3.9
+scikit-learn>=1.5
+gensim>=4.3
+sentence-transformers>=3.0
+transformers>=4.40
+
+# Deep learning
+torch>=2.0
+
+# Visualization
+matplotlib>=3.8
+tqdm>=4.65
