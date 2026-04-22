@@ -7,8 +7,10 @@ Progetto universitario di NLP: scraping di articoli dal sito BBC e classificazio
 ```
 .
 ├── Scraping.ipynb                # scraper BBC multi-classe
-├── Task2.ipynb                   # baseline + LR + NN + W2V + ST + BERT + CV
+├── Task2.ipynb                   # training di tutti i modelli + salvataggio su disco
 ├── bbc_dataset_9classi.csv       # dataset prodotto (7049 righe)
+├── app.py                        # demo Streamlit (tutti i 7 modelli in tempo reale)
+├── models/                       # artefatti salvati dal notebook (gitignored)
 ├── output/                       # confusion matrix + PCA generate
 ├── requirements.txt
 └── README.md
@@ -52,6 +54,16 @@ jupyter notebook Scraping.ipynb
 ```bash
 jupyter notebook Task2.ipynb
 ```
+
+### 4. Demo interattiva (Streamlit)
+
+Dopo aver eseguito `Task2.ipynb` end-to-end, l'ultima cella («Export modelli per Streamlit») salva tutti i 7 modelli in `./models/`. A quel punto:
+
+```bash
+streamlit run app.py
+```
+
+L'app carica i modelli salvati e mostra, per ogni testo incollato, la predizione di tutti e 7 i modelli, la confidenza, la distribuzione di probabilità completa sulle 9 classi e un indicatore di consenso tra modelli.
 
 ## Risultati
 

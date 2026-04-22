@@ -209,3 +209,6 @@ __marimo__/
 
 # Images
 **/output/
+
+# Trained models for Streamlit app (rigenerati eseguendo Task2.ipynb end-to-end)
+**/models/

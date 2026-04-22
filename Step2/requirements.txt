@@ -19,3 +19,7 @@ torch>=2.0
 # Visualization
 matplotlib>=3.8
 tqdm>=4.65
+
+# Demo app
+streamlit>=1.30
+joblib>=1.3
