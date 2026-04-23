@@ -1,11 +1,3 @@
-"""
-app.py — Streamlit demo dei 7 modelli di classificazione BBC News.
-
-    streamlit run app.py
-
-Prerequisito: eseguire Task2.ipynb fino in fondo (incluse le celle finali
-«Export modelli per Streamlit») per generare la cartella ./models/.
-"""
 import os
 import json
 from collections import Counter
@@ -28,9 +20,7 @@ MODELS_DIR = "models"
 DEVICE = torch.device("cpu")
 
 
-# ══════════════════════════════════════════════════════════════════════
-#  Preprocessing (identico a quello di Task2.ipynb)
-# ══════════════════════════════════════════════════════════════════════
+#  Preprocessing
 STOP_WORDS = set(stopwords.words("english"))
 _tokenizer = RegexpTokenizer(r"\w+")
 
@@ -46,11 +36,8 @@ CLASSI = [
 ]
 
 
-# ══════════════════════════════════════════════════════════════════════
-#  Architetture NN (identiche al notebook)
-# ══════════════════════════════════════════════════════════════════════
+#  Architetture NN
 class FeedforwardNN(nn.Module):
-    """FFN 2-layer con Tanh — usata da NN SGD e NN Adam."""
 
     def __init__(self, input_dim: int, hidden_dim: int, n_classi: int):
         super().__init__()
@@ -63,7 +50,6 @@ class FeedforwardNN(nn.Module):
 
 
 class FeedforwardNNDrop(nn.Module):
-    """FFN con ReLU + Dropout — usata da W2V+FFN e ST+FFN."""
 
     def __init__(self, input_dim: int, hidden_dim: int, n_classi: int, dropout: float = 0.3):
         super().__init__()
@@ -78,11 +64,7 @@ class FeedforwardNNDrop(nn.Module):
         return self.net(x)
 
 
-# ══════════════════════════════════════════════════════════════════════
-#  TF-IDF manuale (replica sklearn TfidfVectorizer con sublinear_tf=True +
-#  L2-norm + il nostro tokenizer custom) — evita di picklare la funzione
-#  tokenizza_e_pulisci dentro lo sklearn Pipeline.
-# ══════════════════════════════════════════════════════════════════════
+#  TF-IDF manuale
 def tfidf_transform(text: str, vocab: dict, idf: np.ndarray) -> np.ndarray:
     tokens = tokenizza_e_pulisci(text)
     counts = Counter(tokens)
@@ -90,23 +72,20 @@ def tfidf_transform(text: str, vocab: dict, idf: np.ndarray) -> np.ndarray:
     for tok, cnt in counts.items():
         idx = vocab.get(tok)
         if idx is not None:
-            vec[idx] = (np.log(cnt) + 1.0) * idf[idx]   # sublinear_tf=True
+            vec[idx] = (np.log(cnt) + 1.0) * idf[idx]  
     norm = np.sqrt((vec ** 2).sum())
     if norm > 0:
         vec /= norm
     return vec.astype(np.float32)
 
 
-# ══════════════════════════════════════════════════════════════════════
 #  Streamlit config + sanity check modelli presenti
-# ══════════════════════════════════════════════════════════════════════
 st.set_page_config(
     page_title="BBC News Classifier",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# Nasconde hamburger menu, header (Deploy button) e footer «Made with Streamlit»
 st.markdown(
     """
     <style>
@@ -138,9 +117,7 @@ if missing:
     st.stop()
 
 
-# ══════════════════════════════════════════════════════════════════════
 #  Loader cachati (ogni modello caricato una sola volta)
-# ══════════════════════════════════════════════════════════════════════
 @st.cache_resource
 def load_label_encoder():
     return joblib.load(os.path.join(MODELS_DIR, "label_encoder.pkl"))
@@ -226,9 +203,7 @@ def load_bert():
     return tok, mdl, cfg
 
 
-# ══════════════════════════════════════════════════════════════════════
 #  Funzioni di inferenza (una per modello)
-# ══════════════════════════════════════════════════════════════════════
 def predict_rule_based(text, keyword_per_classe):
     tokens = tokenizza_e_pulisci(text)
     punteggi = {cls: sum(1 for t in tokens if t in keyword_per_classe[cls]) for cls in CLASSI}
@@ -313,10 +288,7 @@ def predict_bert(text, bert_tok, bert_model, le, max_len=256):
     pred = le.classes_[probs.argmax()]
     return pred, dict(zip(le.classes_, probs))
 
-
-# ══════════════════════════════════════════════════════════════════════
 #  UI
-# ══════════════════════════════════════════════════════════════════════
 EXAMPLES = {
     "Football": (
         "Manchester United beat Arsenal 2-1 at Old Trafford last night, with "
@@ -346,9 +318,7 @@ DEFAULT_TEXT = (
 )
 
 
-# Inizializzazione session state PRIMA di creare il widget text_area
-# (Streamlit vieta di modificare st.session_state[key] dopo che il widget
-# con quella key è stato instanziato — la callback on_click risolve il problema)
+# Inizializzazione session state
 if "input_text" not in st.session_state:
     st.session_state["input_text"] = DEFAULT_TEXT
 
