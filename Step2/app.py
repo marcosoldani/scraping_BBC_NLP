@@ -15,30 +15,32 @@ nltk.download("stopwords", quiet=True)
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 
-
+# =========================
+# CONFIG
+# =========================
 MODELS_DIR = "models"
 DEVICE = torch.device("cpu")
 
-
-#  Preprocessing
 STOP_WORDS = set(stopwords.words("english"))
 _tokenizer = RegexpTokenizer(r"\w+")
-
-
-def tokenizza_e_pulisci(testo: str) -> list[str]:
-    tokens = _tokenizer.tokenize(testo.lower())
-    return [t for t in tokens if t.isalpha() and t not in STOP_WORDS and len(t) > 2]
-
 
 CLASSI = [
     "non_sport", "football", "tennis", "rugby", "cricket",
     "other_sport", "formula1", "american_football", "golf",
 ]
 
+# =========================
+# PREPROCESSING
+# =========================
+def tokenizza_e_pulisci(testo: str) -> list[str]:
+    tokens = _tokenizer.tokenize(testo.lower())
+    return [t for t in tokens if t.isalpha() and t not in STOP_WORDS and len(t) > 2]
 
+# =========================
+# MODELS
+# =========================
 #  Architetture NN
 class FeedforwardNN(nn.Module):
-
     def __init__(self, input_dim: int, hidden_dim: int, n_classi: int):
         super().__init__()
         self.hidden = nn.Linear(input_dim, hidden_dim)
@@ -50,7 +52,6 @@ class FeedforwardNN(nn.Module):
 
 
 class FeedforwardNNDrop(nn.Module):
-
     def __init__(self, input_dim: int, hidden_dim: int, n_classi: int, dropout: float = 0.3):
         super().__init__()
         self.net = nn.Sequential(
@@ -64,6 +65,9 @@ class FeedforwardNNDrop(nn.Module):
         return self.net(x)
 
 
+# =========================
+# TF-IDF
+# =========================
 #  TF-IDF manuale
 def tfidf_transform(text: str, vocab: dict, idf: np.ndarray) -> np.ndarray:
     tokens = tokenizza_e_pulisci(text)
@@ -79,7 +83,9 @@ def tfidf_transform(text: str, vocab: dict, idf: np.ndarray) -> np.ndarray:
     return vec.astype(np.float32)
 
 
-#  Streamlit config + sanity check modelli presenti
+# =========================
+# STREAMLIT CONFIG
+# =========================
 st.set_page_config(
     page_title="BBC News Classifier",
     layout="wide",
