@@ -286,8 +286,10 @@ def predict_bert(text, bert_tok, bert_model, le, max_len=256):
         text,
         truncation=True, padding="max_length", max_length=max_len,
         return_tensors="pt",
+        return_token_type_ids=False,
     )
-    enc = {k: v.to(DEVICE) for k, v in enc.items()}
+    accepted = set(bert_model.forward.__code__.co_varnames)
+    enc = {k: v.to(DEVICE) for k, v in enc.items() if k in accepted}
     with torch.no_grad():
         logits = bert_model(**enc).logits
         probs = F.softmax(logits, dim=-1).cpu().numpy()[0]
